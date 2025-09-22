@@ -1,2 +1,6 @@
 mylinks.db
-main
+# Ignorar binário compilado "main"
+/main
+
+# Mas manter qualquer main.go
+!**/main.go
