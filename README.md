@@ -23,4 +23,5 @@ docker run -p 8080:8080 passlink
 - [ ] Add E2E tests
 - [ ] Single responsability in usecase layer
 - [ ] Change SqlLite for Postgres
+- [ ] Add docker-compose file
 - [ ] Add env enviroment
