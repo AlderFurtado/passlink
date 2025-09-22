@@ -1,52 +1,11 @@
-package main
+package controller
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
-
-	"github.com/AlderFurtado/passlink/internal/domain/usecase"
 )
 
-type LinkRequest struct {
-	Link   string `json:"link"` // exportado para JSON funcionar
-	IsPaid bool   `json:"bool"` // exportado para JSON funcionar
-}
-
-type LinkResponse struct {
-	Link string `json:"link"`
-}
-
-func handlerGetOrigin(w http.ResponseWriter, r *http.Request) {
-	destinyRequest := "http://localhost:8080" + r.URL.Path
-	origin, err := usecase.FindOriginLinkUseCase(destinyRequest)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	http.Redirect(w, r, origin, http.StatusFound)
-}
-
-func handlerNewLink(w http.ResponseWriter, r *http.Request) {
-	var req LinkRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		http.Error(w, "Erro ao decodificar JSON", http.StatusBadRequest)
-		return
-	}
-	defer r.Body.Close()
-
-	link, err := usecase.GenerateLinkUseCase(req.Link, req.IsPaid)
-	if err != nil {
-		http.Error(w, "Erro ao gerar novo link", http.StatusBadRequest)
-		return
-	}
-	newLink := LinkResponse{Link: link}
-	json.NewEncoder(w).Encode(newLink)
-
-}
-
-func homeHandler(w http.ResponseWriter, _ *http.Request) {
+func HandlerHome(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprint(w, `
 	<!DOCTYPE html>
@@ -98,19 +57,4 @@ func homeHandler(w http.ResponseWriter, _ *http.Request) {
 	</body>
 	</html>
 	`)
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	if strings.Contains(r.URL.Path, "/get") && r.Method == "GET" {
-		handlerGetOrigin(w, r)
-	} else if strings.Contains(r.URL.Path, "/newLink") && r.Method == "POST" {
-		handlerNewLink(w, r)
-	} else {
-		homeHandler(w, r)
-	}
-}
-
-func main() {
-	http.HandleFunc("/", handler)
-	http.ListenAndServe(":8080", nil)
 }
