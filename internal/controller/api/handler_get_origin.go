@@ -1,16 +1,21 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/AlderFurtado/passlink/internal/domain/usecase"
+	"github.com/gin-gonic/gin"
 )
 
-func HandlerGetOrigin(w http.ResponseWriter, r *http.Request) {
-	destinyRequest := "http://localhost:8080" + r.URL.Path
+func HandlerGetOrigin(c *gin.Context) {
+	destinyRequest := "http://localhost:8080/get?term=" + c.Query("term")
+	fmt.Print(destinyRequest)
 	origin, err := usecase.FindOriginLinkUseCase(destinyRequest)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
 	}
-	http.Redirect(w, r, origin, http.StatusFound)
+	c.Redirect(http.StatusMovedPermanently, origin)
 }

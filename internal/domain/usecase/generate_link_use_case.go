@@ -56,5 +56,5 @@ func matchDestiny(links []entity.Link, newLink string) bool {
 }
 
 func generateRandomHttpLink() string {
-	return fmt.Sprintf("http://localhost:8080/get/%v", utils.RandomWord(6))
+	return fmt.Sprintf("http://localhost:8080/get?term=%v", utils.RandomWord(6))
 }
